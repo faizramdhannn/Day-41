@@ -1,12 +1,9 @@
-const { Product, Category, Brand, ProductMedia } = require('../models');
+const { Product, ProductMedia } = require('../models');
 const { Op } = require('sequelize');
 
 class ProductService {
-  /**
-   * Get all products dengan filter dan pagination
-   */
   async getAllProducts(filters = {}) {
-    const { page = 1, limit = 10, search, category_id, brand_id, min_price, max_price } = filters;
+    const { page = 1, limit = 10, search, category, brand, min_price, max_price } = filters;
     const offset = (page - 1) * limit;
     
     const where = {};
@@ -16,14 +13,12 @@ class ProductService {
       where.name = { [Op.iLike]: `%${search}%` };
     }
     
-    // Filter category
-    if (category_id) {
-      where.category_id = category_id;
+    if (category) {
+      where.category = { [Op.iLike]: `%${category}%` };
     }
     
-    // Filter brand
-    if (brand_id) {
-      where.brand_id = brand_id;
+    if (brand) {
+      where.brand = { [Op.iLike]: `%${brand}%` };
     }
     
     // Filter price range
@@ -36,8 +31,6 @@ class ProductService {
     const { count, rows } = await Product.findAndCountAll({
       where,
       include: [
-        { model: Category, as: 'category' },
-        { model: Brand, as: 'brand' },
         { model: ProductMedia, as: 'media' }
       ],
       limit,
@@ -53,14 +46,9 @@ class ProductService {
     };
   }
 
-  /**
-   * Get product by ID
-   */
   async getProductById(productId) {
     const product = await Product.findByPk(productId, {
       include: [
-        { model: Category, as: 'category' },
-        { model: Brand, as: 'brand' },
         { model: ProductMedia, as: 'media' }
       ]
     });
@@ -72,18 +60,11 @@ class ProductService {
     return product;
   }
 
-  /**
-   * Create product
-   */
   async createProduct(productData) {
     const product = await Product.create(productData);
-    
     return await this.getProductById(product.id);
   }
 
-  /**
-   * Update product
-   */
   async updateProduct(productId, productData) {
     const product = await Product.findByPk(productId);
     
@@ -92,13 +73,9 @@ class ProductService {
     }
     
     await product.update(productData);
-    
     return await this.getProductById(productId);
   }
 
-  /**
-   * Delete product
-   */
   async deleteProduct(productId) {
     const product = await Product.findByPk(productId);
     
@@ -107,23 +84,9 @@ class ProductService {
     }
     
     await product.destroy();
-    
     return true;
   }
-
-  /**
-   * Get all categories
-   */
-  async getAllCategories() {
-    return await Category.findAll();
-  }
-
-  /**
-   * Get all brands
-   */
-  async getAllBrands() {
-    return await Brand.findAll();
-  }
+  
 }
 
 module.exports = new ProductService();

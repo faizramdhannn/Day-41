@@ -13,13 +13,11 @@ const productValidation = [
   validate
 ];
 
-// Public routes (no auth required)
+// Public routes
 router.get('/', optionalAuth, productController.getAllProducts);
-router.get('/categories', productController.getAllCategories);
-router.get('/brands', productController.getAllBrands);
 router.get('/:id', optionalAuth, productController.getProductById);
 
-// Protected routes (auth required)
+// Protected routes
 router.post('/', authenticate, productValidation, productController.createProduct);
 router.put('/:id', authenticate, productValidation, productController.updateProduct);
 router.delete('/:id', authenticate, productController.deleteProduct);

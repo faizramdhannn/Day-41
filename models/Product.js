@@ -15,12 +15,12 @@ const Product = sequelize.define('Product', {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  brand_id: {
-    type: DataTypes.INTEGER,
+  brand: {
+    type: DataTypes.STRING(100),
     allowNull: true
   },
-  category_id: {
-    type: DataTypes.INTEGER,
+  category: {
+    type: DataTypes.STRING(100),
     allowNull: true
   },
   price: {

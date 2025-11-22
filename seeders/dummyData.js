@@ -3,12 +3,8 @@ const sequelize = require('../db');
 const {
   User,
   UserAddress,
-  Category,
-  Brand,
   Product,
   ProductMedia,
-  Cart,
-  CartItem,
   Order,
   OrderItem,
   Payment,
@@ -20,27 +16,7 @@ const seedData = async () => {
   try {
     logger.info('Starting data seeding...');
 
-    // 1. Create Categories
-    logger.info('Seeding categories...');
-    const categories = await Category.bulkCreate([
-      { name: 'Laptop', slug: 'laptop' },
-      { name: 'Smartphone', slug: 'smartphone' },
-      { name: 'Audio', slug: 'audio' },
-      { name: 'Peripheral', slug: 'peripheral' },
-      { name: 'Wearable', slug: 'wearable' }
-    ]);
-
-    // 2. Create Brands
-    logger.info('Seeding brands...');
-    const brands = await Brand.bulkCreate([
-      { name: 'Asus', slug: 'asus' },
-      { name: 'Samsung', slug: 'samsung' },
-      { name: 'Sony', slug: 'sony' },
-      { name: 'Keychron', slug: 'keychron' },
-      { name: 'Apple', slug: 'apple' }
-    ]);
-
-    // 3. Create Users
+    // 1. Create Users
     logger.info('Seeding users...');
     const hashedPassword = await bcrypt.hash('password123', 10);
     const users = await User.bulkCreate([
@@ -67,26 +43,10 @@ const seedData = async () => {
         phone: '081234567892',
         password: hashedPassword,
         birthday: '1988-08-10'
-      },
-      {
-        full_name: 'Alice Johnson',
-        nickname: 'alicejohnson',
-        email: 'alice@example.com',
-        phone: '081234567893',
-        password: hashedPassword,
-        birthday: '1995-03-25'
-      },
-      {
-        full_name: 'Charlie Brown',
-        nickname: 'charliebrown',
-        email: 'charlie@example.com',
-        phone: '081234567894',
-        password: hashedPassword,
-        birthday: '1991-11-30'
       }
     ]);
 
-    // 4. Create User Addresses
+    // 2. Create User Addresses
     logger.info('Seeding user addresses...');
     await UserAddress.bulkCreate([
       {
@@ -113,14 +73,14 @@ const seedData = async () => {
       }
     ]);
 
-    // 5. Create Products
+    // 3. Create Products 
     logger.info('Seeding products...');
     const products = await Product.bulkCreate([
       {
         name: 'Laptop Asus VivoBook 14 A1400',
         description: 'Laptop ringan dengan prosesor AMD Ryzen 5, RAM 8GB, dan SSD 512GB.',
-        brand_id: brands[0].id,
-        category_id: categories[0].id,
+        brand: 'Asus',        
+        category: 'Laptop',   
         price: 8499000,
         stock: 12,
         rating: 4.7
@@ -128,8 +88,8 @@ const seedData = async () => {
       {
         name: 'Smartphone Samsung Galaxy A55 5G',
         description: 'Smartphone mid-range dengan layar Super AMOLED 6.6 inci, baterai 5000mAh.',
-        brand_id: brands[1].id,
-        category_id: categories[1].id,
+        brand: 'Samsung',
+        category: 'Smartphone',
         price: 5999000,
         stock: 20,
         rating: 4.8
@@ -137,8 +97,8 @@ const seedData = async () => {
       {
         name: 'Headphone Sony WH-1000XM5',
         description: 'Headphone wireless dengan noise cancelling terbaik di kelasnya.',
-        brand_id: brands[2].id,
-        category_id: categories[2].id,
+        brand: 'Sony',
+        category: 'Audio',
         price: 4999000,
         stock: 15,
         rating: 4.9
@@ -146,8 +106,8 @@ const seedData = async () => {
       {
         name: 'Mechanical Keyboard Keychron K6 RGB',
         description: 'Keyboard mechanical 65% layout dengan switch Gateron Brown.',
-        brand_id: brands[3].id,
-        category_id: categories[3].id,
+        brand: 'Keychron',
+        category: 'Peripheral',
         price: 1350000,
         stock: 25,
         rating: 4.6
@@ -155,43 +115,25 @@ const seedData = async () => {
       {
         name: 'Smartwatch Apple Watch SE 2nd Gen',
         description: 'Smartwatch dengan fitur pelacak kebugaran dan sensor detak jantung.',
-        brand_id: brands[4].id,
-        category_id: categories[4].id,
+        brand: 'Apple',
+        category: 'Wearable',
         price: 5499000,
         stock: 18,
         rating: 4.8
       }
     ]);
 
-    // 6. Create Product Media
+    // 4. Create Product Media
     logger.info('Seeding product media...');
     await ProductMedia.bulkCreate([
       { product_id: products[0].id, media_type: 'image', url: 'https://images.unsplash.com/photo-1587202372775-98927d7dbd06?w=800' },
-      { product_id: products[0].id, media_type: 'video', url: 'https://www.youtube.com/watch?v=z4H5o4_yN6w' },
       { product_id: products[1].id, media_type: 'image', url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800' },
       { product_id: products[2].id, media_type: 'image', url: 'https://images.unsplash.com/photo-1580894908361-967195033215?w=800' },
       { product_id: products[3].id, media_type: 'image', url: 'https://images.unsplash.com/photo-1607083205972-7eec3b7b8a7b?w=800' },
       { product_id: products[4].id, media_type: 'image', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800' }
     ]);
 
-    // 7. Create Carts
-    logger.info('Seeding carts...');
-    const carts = await Cart.bulkCreate([
-      { user_id: users[0].id },
-      { user_id: users[1].id },
-      { user_id: users[2].id }
-    ]);
-
-    // 8. Create Cart Items
-    logger.info('Seeding cart items...');
-    await CartItem.bulkCreate([
-      { cart_id: carts[0].id, product_id: products[0].id, quantity: 1 },
-      { cart_id: carts[0].id, product_id: products[2].id, quantity: 1 },
-      { cart_id: carts[1].id, product_id: products[1].id, quantity: 1 },
-      { cart_id: carts[1].id, product_id: products[3].id, quantity: 2 }
-    ]);
-
-    // 9. Create Orders
+    // 5. Create Orders
     logger.info('Seeding orders...');
     const orders = await Order.bulkCreate([
       {
@@ -217,7 +159,7 @@ const seedData = async () => {
       }
     ]);
 
-    // 10. Create Order Items
+    // 6. Create Order Items
     logger.info('Seeding order items...');
     await OrderItem.bulkCreate([
       {
@@ -243,7 +185,7 @@ const seedData = async () => {
       }
     ]);
 
-    // 11. Create Payments
+    // 7. Create Payments
     logger.info('Seeding payments...');
     await Payment.bulkCreate([
       {
@@ -261,18 +203,10 @@ const seedData = async () => {
         transaction_id: 'TRX-20251103-0002',
         amount: 6019000,
         paid_at: new Date()
-      },
-      {
-        order_id: orders[2].id,
-        provider: 'e_wallet',
-        status: 'paid',
-        transaction_id: 'TRX-20251103-0003',
-        amount: 5019000,
-        paid_at: new Date()
       }
     ]);
 
-    // 12. Create Shipments
+    // 8. Create Shipments
     logger.info('Seeding shipments...');
     await Shipment.bulkCreate([
       {
@@ -287,14 +221,6 @@ const seedData = async () => {
         tracking_number: 'SICEPAT-20251103-0002',
         status: 'shipped',
         shipped_at: new Date()
-      },
-      {
-        order_id: orders[2].id,
-        courier: 'J&T',
-        tracking_number: 'JT-20251103-0003',
-        status: 'delivered',
-        shipped_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        delivered_at: new Date()
       }
     ]);
 
@@ -312,5 +238,4 @@ const seedData = async () => {
   }
 };
 
-// Run seeder
 seedData();

@@ -9,7 +9,6 @@ const { authenticate } = require('../middlewares/auth');
 const userRoutes = require('./user.routes');
 const productRoutes = require('./product.routes');
 const orderRoutes = require('./order.routes');
-const cartRoutes = require('./cart.routes');
 
 // Auth validation rules
 const registerValidation = [
@@ -46,8 +45,7 @@ router.get('/', (req, res) => {
       },
       users: 'GET /api/users',
       products: 'GET /api/products',
-      orders: 'GET /api/orders',
-      cart: 'GET /api/cart'
+      orders: 'GET /api/orders'
     }
   });
 });
@@ -62,6 +60,5 @@ router.put('/auth/password', authenticate, updatePasswordValidation, authControl
 router.use('/users', userRoutes);
 router.use('/products', productRoutes);
 router.use('/orders', orderRoutes);
-router.use('/cart', cartRoutes);
 
 module.exports = router;
